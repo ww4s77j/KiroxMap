@@ -6,7 +6,7 @@ bin
 .classpath
 .project
 
-# idea
+# idea / jetbrains
 out
 *.ipr
 *.iws
@@ -14,11 +14,54 @@ out
 .idea/*
 !.idea/scopes
 
+# vscode / other editors
+.vscode/
+.history/
+.fleet/
+*.swp
+*~
+
 # gradle
 build
 .gradle
 
-# other
-eclipse
+# local build/version overrides
+local.properties
+gradle.properties.local
+
+# loom / dev runs
 run
 runs
+
+# runtime data if the game is launched from the repo
+logs/
+crash-reports/
+kirox-map-cache/
+
+# java crash dumps and stray classes
+hs_err_pid*
+replay_pid*
+*.hprof
+*.class
+
+# python tooling (icon generators, scripts)
+__pycache__/
+*.py[cod]
+
+# os junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# temp files
+*.tmp
+*.bak
+*.orig
+*.rej
+*.log
+
+# local agent settings
+.claude/settings.local.json
+
+# superpowers scratch workspace
+.superpowers/
