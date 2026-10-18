@@ -11,8 +11,14 @@ import net.minecraft.client.KeyMapping;
  */
 public final class KiroxKeys {
 	public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(KiroxMap.id("main"));
+//? if >=26.3 {
 	public static final KeyMapping OPEN_MAP = new KeyMapping(
 			"key.kirox_map.open_map", InputConstants.Type.KEYBOARD, InputConstants.KEY_M, CATEGORY);
+//?}
+//? if <26.3 {
+/*public static final KeyMapping OPEN_MAP = new KeyMapping(
+			"key.kirox_map.open_map", InputConstants.Type.KEYSYM, InputConstants.KEY_M, CATEGORY);
+*///?}
 
 	private KiroxKeys() {
 	}
