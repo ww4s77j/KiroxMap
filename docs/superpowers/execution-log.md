@@ -67,3 +67,27 @@ Key rulings recorded in the SDD ledger:
 - Final fix: a real Stonecutter conditional in `KiroxKeys`:
   `//? if >=26.3 { ... KEYBOARD ... }` and `//? if <26.3 { /* ... KEYSYM ... */ }`.
 - Rebuilding 26.2.
+
+### 2026-10-18 — Task 3: complete
+
+- Committed as `ef8ccb5` (`build: add 26.2 Stonecutter node`); verification rerun `./gradlew :26.2:build` → BUILD SUCCESSFUL, 5 tests pass.
+- Ledger: `Task 3: complete (commits 66fc47b..ef8ccb5, tests: ./gradlew :26.2:build)`.
+
+### 2026-10-18 — Task 4: 26.1.2 node (in progress)
+
+- First `./gradlew :26.1.2:build` failed with 7 errors: `Minecraft.gui` has no `screen()`/`setScreen(...)` in 26.1.2.
+  Verified with javap against the merged jars: 26.1.2 has the public field `Minecraft.screen` and `Minecraft.setScreen(Screen)`;
+  26.2/26.3 moved them to `Gui.screen()` / `Gui.setScreen(...)`.
+- Fix: new `com.kiroxtm.client.Screens` helper (`current`, `open`) with a `//? if >=26.2` conditional; the six call sites
+  (`KiroxClient`, `AtlasScreen` ×2, `KiroxConfigScreen`, `WaypointScreen`) now use it. Rebuilding 26.1.2.
+
+- Second build: **BUILD SUCCESSFUL in 59s**; 5 tests pass (`CoreMathTest` 4, `SeedWorldVersionTest` 1).
+  Generated `BuildInfo` for the node: `MINECRAFT = "26.1.2"`, `CUBIOMES_MC = Cubiomes.MC_26_1()`.
+- Client launch: `kirox_map 1.0.1`, Minecraft 26.1.2, Fabric Loader 0.19.5, Java 25;
+  `Kirox Map loaded on Fabric`; LWJGL 3.4.1-snapshot, OpenAL and all atlases initialized.
+  The JVM then exited with NTSTATUS 0xCFFFFFFF (-805306369) with no crash report and no hs_err.
+  This happened while the user's own PrismLauncher 26.3 client was running; startup took 12 minutes.
+  The interactive M/seed/map check stays deferred to the user.
+
+- Correction: the NTSTATUS 0xCFFFFFFF exit was the user closing the 26.1.2 window, not a crash. The launch was clean
+  (mod loaded, LWJGL, OpenAL and all atlases initialized). Interactive M/seed/map check remains deferred to the user.

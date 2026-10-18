@@ -7,6 +7,7 @@ import java.util.OptionalLong;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import com.kiroxtm.client.KiroxKeys;
+import com.kiroxtm.client.Screens;
 import com.kiroxtm.config.AtlasConfig;
 import com.kiroxtm.config.Waypoint;
 import com.kiroxtm.map.MapView;
@@ -212,12 +213,12 @@ public final class AtlasScreen extends Screen {
 			@Override
 			public void create(int x, int z) {
 				Waypoint w = new Waypoint("", x, z, session.dim.key(), Waypoint.COLORS[config.waypointsFor(worldKey).size() % Waypoint.COLORS.length]);
-				minecraft.gui.setScreen(new WaypointScreen(AtlasScreen.this, config.waypointsFor(worldKey), w, true));
+				Screens.open(minecraft, new WaypointScreen(AtlasScreen.this, config.waypointsFor(worldKey), w, true));
 			}
 
 			@Override
 			public void edit(Waypoint waypoint) {
-				minecraft.gui.setScreen(new WaypointScreen(AtlasScreen.this, config.waypointsFor(worldKey), waypoint, false));
+				Screens.open(minecraft, new WaypointScreen(AtlasScreen.this, config.waypointsFor(worldKey), waypoint, false));
 			}
 		});
 		map.setLayout(plates, topY + PLATE_H + 4, rowY - 16, config.showHelp ? helpTop : -1);

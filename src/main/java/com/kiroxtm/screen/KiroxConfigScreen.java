@@ -3,6 +3,7 @@ package com.kiroxtm.screen;
 import java.util.function.BooleanSupplier;
 
 import com.kiroxtm.client.KiroxKeys;
+import com.kiroxtm.client.Screens;
 import com.kiroxtm.config.AtlasConfig;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -51,7 +52,7 @@ public final class KiroxConfigScreen extends Screen {
 	@Override
 	public void onClose() {
 		config.save();
-		minecraft.gui.setScreen(parent);
+		Screens.open(minecraft, parent);
 	}
 
 	@Override

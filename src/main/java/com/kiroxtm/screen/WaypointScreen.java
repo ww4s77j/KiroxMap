@@ -2,6 +2,7 @@ package com.kiroxtm.screen;
 
 import java.util.List;
 
+import com.kiroxtm.client.Screens;
 import com.kiroxtm.config.AtlasConfig;
 import com.kiroxtm.config.Waypoint;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -106,7 +107,7 @@ final class WaypointScreen extends Screen {
 
 	@Override
 	public void onClose() {
-		minecraft.gui.setScreen(parent);
+		Screens.open(minecraft, parent);
 	}
 
 	@Override
