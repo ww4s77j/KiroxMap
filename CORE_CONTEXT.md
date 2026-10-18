@@ -1,7 +1,7 @@
 # KiroxMap: contexto del proyecto y del core (cubiomes)
 
 Documento para pegar en otros chats o prompts cuando haga falta contexto: versiones, cómo funciona el core,
-qué funciones se usan y cómo actualizarlo. Estado de referencia: **KiroxMap 1.0.1 + relieve del terreno**, 2026-10-14.
+qué funciones se usan y cómo actualizarlo. Estado de referencia: **KiroxMap 1.0.1 + relieve del terreno**, 2026-10-18.
 Todo lo de este estado compiló y funcionó en el equipo del autor (Windows, PowerShell, `./gradlew build`).
 
 ---
@@ -10,27 +10,29 @@ Todo lo de este estado compiló y funcionó en el equipo del autor (Windows, Pow
 
 - **Qué es:** mod de mapa a pantalla completa (tecla **M**) que dibuja biomas y estructuras **solo a partir de la semilla del mundo**.
   Nunca carga chunks ni lee bloques. **Solo cliente.**
-- **Loaders:** Fabric y NeoForge, mismo código en el módulo `common/`.
+- **Loader:** Fabric, un único árbol de código en `src/main/` compilado por Stonecutter para cada versión de Minecraft.
 - **Autor / licencia del mod:** Kirox, CC0-1.0.
-- **Idiomas del mod:** `en_us.json` y `es_es.json` en `common/src/main/resources/assets/kirox_map/lang/`.
+- **Idiomas del mod:** `en_us.json` y `es_es.json` en `src/main/resources/assets/kirox_map/lang/`.
 
-## 2. Versiones (de `gradle.properties` y de la salida de Gradle)
+## 2. Versiones (de `stonecutter.properties.toml` y de la salida de Gradle)
 
 | Pieza | Versión |
 |---|---|
-| Minecraft | 26.3 (rango `[26.3, 26.4)`) |
-| Java | 25 (toolchain y `options.release`) |
+| Minecraft (nodos Stonecutter) | 26.1.2 (`>=26.1 <26.2`), 26.2 (`~26.2`), 26.3 (`~26.3`) |
+| Java | 25 (toolchain) |
 | Gradle | 9.7.1 |
+| Stonecutter | 0.9.8 |
+| `dev.kikugie.loom-back-compat` | 0.4.2 (Loom 1.18-SNAPSHOT) |
 | Fabric Loom | 1.18.4 |
-| Fabric Loader / API | 0.19.5 / 0.162.0+26.3 |
-| NeoForge | 26.3.0.43-beta (mínimo 26.3.0.0-beta) |
-| NeoForm | 26.3-1 |
+| Fabric Loader | 0.19.5 |
+| Fabric API | 0.155.3+26.1.2 / 0.161.0+26.2 / 0.163.0+26.3 |
+| NeoForge | eliminado |
 | **cubiomes (bindings)** | `0.0.0-2026.9.22.1790089484+18edd56575a60fe7129705bf972de0a511437527` |
 | Versión del mod | 1.0.1 |
 
-`mod_id=kirox_map` (idéntico en `fabric.mod.json`, `neoforge.mods.toml` y `KiroxMap.MOD_ID`; NeoForge no admite `-`).
-Si se añade un campo a `gradle.properties` que usen los recursos, hay que añadirlo también a `expandProps` en
-`build-logic/src/main/groovy/multiloader-common.gradle`.
+`mod_id=kirox_map` (idéntico en `fabric.mod.json` y `KiroxMap.MOD_ID`). Las versiones por nodo están en
+`stonecutter.properties.toml`; los valores que la plantilla `fabric.mod.json` expande se declaran en el bloque
+`processResources` de `build.gradle.kts`.
 
 ---
 
@@ -49,7 +51,7 @@ Si se añade un campo a `gradle.properties` que usen los recursos, hay que añad
 
 ### 3.2 Dónde se publica y cómo es la versión
 
-- Repositorio Maven: `https://maven.xpple.dev/maven2/` (declarado en `multiloader-common.gradle`, solo para el grupo `dev.xpple`).
+- Repositorio Maven: `https://maven.xpple.dev/maven2/` (declarado en `build.gradle.kts`, solo para el grupo `dev.xpple`).
   También aparece en Maven Central.
 - Formato de la versión: `0.0.0-<AAAA.M.D>.<segundos epoch>+<commit de master>`.
 - **El número de segundos es la hora a la que el CI compiló el paquete**, no la del commit. **No se puede calcular**:
@@ -64,9 +66,8 @@ Si se añade un campo a `gradle.properties` que usen los recursos, hay que añad
 - **JDK 23 o superior** (usan la API Foreign Function & Memory; el proyecto usa Java 25, así que no hay problema).
 - Hay que llamar a `CubiomesInit.load()` antes de usar nada. En el mod lo hace `world/NativeLib.java`
   (que además carga la librería nativa con el nombre correcto según plataforma).
-- La dependencia se mete en el jar: `include(implementation(...))` en `fabric/build.gradle` (jar-in-jar de Loom) y
-  `jarJar(implementation(...))` en `neoforge/build.gradle`. NeoForge necesita además un ajuste para el acceso FFM nativo
-  (comentado en su `build.gradle`).
+- La dependencia se mete en el jar con `implementation(cubiomes)` + `include(cubiomes)` en `build.gradle.kts`
+  (jar-in-jar de Loom); `include(implementation(...))` no compila en el DSL de Kotlin.
 - Licencias: bindings LGPL-3.0; cubiomes (Cubitect) MIT; el código propio del mod CC0-1.0.
 
 ### 3.4 Cómo ver la API real (sin tener el jar)
@@ -118,7 +119,7 @@ end city ship, end gateway.
 
 ---
 
-## 4. Arquitectura del mod (`common/src/main/java/com/kiroxtm/`)
+## 4. Arquitectura del mod (`src/main/java/com/kiroxtm/`)
 
 | Paquete | Archivos clave | Responsabilidad |
 |---|---|---|
@@ -127,10 +128,11 @@ end city ship, end gateway.
 | `screen/` | `AtlasScreen`, `AtlasSession`, `MapCanvas`, `SidePanel`, `WaypointScreen`, `IconButton`, `ToolIcon`, `Icons`, `KiroxConfigScreen` | Interfaz: barra de botones, lienzo del mapa, panel lateral, waypoints. |
 | `config/` | `AtlasConfig`, `Waypoint` | Ajustes y waypoints. |
 | `client/` | `KiroxClient`, `KiroxKeys`, `ErrorLog` | Arranque, tecla M, registro de errores. |
-| `platform/` | `Services` | Puente a Fabric/NeoForge. |
+| `platform/` | `Services` | Puente al loader (solo Fabric). |
 
 Zoom: `MapView.DEFAULT_ZOOM = 2`, `MAX_BLOCKS_PER_PIXEL = 8`. Los iconos del mapa se reducen linealmente hasta el 25% al
-alejar desde el zoom base. Hay una comprobación de capas (`checkLayering`) que impide que `common` use cosas de un loader.
+alejar desde el zoom base. El código común ya no importa nada de un loader concreto; el arranque específico de Fabric está en
+`src/main/java/com/kiroxtm/fabric/`.
 
 ### Relieve (`map/Relief.java`, matemática pura y con tests)
 
@@ -164,33 +166,39 @@ y su PNG con el mismo nombre en minúsculas.
 
 ## 5. Checklist: actualizar el core o Minecraft
 
-1. Elegir la build en `https://maven.xpple.dev/maven2/dev/xpple/cubiomes/` y copiar el nombre **exacto** a `cubiomes_version`.
-2. Si sube Minecraft: actualizar `minecraft_version`, `minecraft_version_range`, `neo_form_version`, versiones de Fabric y NeoForge,
-   y comprobar que existe la constante `Cubiomes.MC_<versión>()` en los bindings (ahora se usa `MC_26_3`).
+1. Elegir la build en `https://maven.xpple.dev/maven2/dev/xpple/cubiomes/` y copiar el nombre **exacto** a `deps.cubiomes`
+   en `stonecutter.properties.toml`.
+2. Si sube Minecraft: añadir el nodo en `settings.gradle.kts` (`versions(...)`), su sección en `stonecutter.properties.toml`
+   (`mod.mc_compat`, `mod.mc_releases`, `deps.fabric_api`), el swap `cubiomes_mc_id` en `stonecutter.gradle.kts`
+   y comprobar que existe la constante `Cubiomes.MC_<versión>()` en los bindings.
 3. Subir `DiskCache.FORMAT`.
 4. Comparar la API usada (sección 3.5) con los bindings nuevos: `git diff <commit viejo> <commit nuevo> -- src/main/java` en la rama
    `java-bindings` (en la actualización a `4f04235` solo cambió `CubiomesInit.java`).
 5. Revisar que `StructureKind` sigue al día (estructuras nuevas del juego) y que `NativeLib` sigue cargando bien en Windows, Linux y macOS.
-6. `./gradlew build` (compila los dos loaders y pasa los tests y la comprobación de capas); probar con `./gradlew :fabric:runClient`
-   y `:neoforge:runClient`.
+6. `./gradlew build` (compila los tres nodos y pasa los tests); probar con `./gradlew :26.3:runClient` (o el nodo que toque).
 7. Anotar el cambio en `REVERT_NOTES.md` (lleva una sección por cambio con archivos tocados y cómo revertirlo).
 
 ## 6. Comandos útiles
 
 ```bash
-./gradlew build                # los dos loaders + tests
-./gradlew :fabric:build        # solo Fabric
-./gradlew :neoforge:build      # solo NeoForge
-./gradlew :fabric:runClient    # probar en Fabric
-./gradlew :neoforge:runClient  # probar en NeoForge
+./gradlew build                # los tres nodos + tests
+./gradlew :26.1.2:build        # un nodo concreto
+./gradlew :26.2:build
+./gradlew :26.3:build
+./gradlew :26.3:runClient      # probar un nodo
+./gradlew buildAndCollect      # copiar los tres jars a build/libs/<versión>/
 ```
 
-Los jars quedan en `fabric/build/libs/` y `neoforge/build/libs/` (los que no llevan `-sources` ni `-javadoc`).
+Los jars quedan en `build/libs/<versión del mod>/` (los que no llevan `-sources`).
 
 ## 7. Notas para asistentes (Claude u otros)
 
-- En el entorno del asistente no hay JDK ni las librerías de Minecraft: **no se puede compilar el mod ahí**. Lo que se entrega
-  hay que compilarlo en el equipo del autor; si algo falla, pedir el error de Gradle.
+- El proyecto usa **Stonecutter**: un único árbol en `src/main/` y un subproyecto por versión en `versions/`.
+  Las diferencias de API entre versiones se resuelven con condicionales de Stonecutter (`//? if >=26.2 { ... //?}`),
+  no duplicando archivos. Los nodos son `26.1.2`, `26.2` y `26.3`; `stonecutter active` marca el que edita el IDE.
+- Los commits de la migración de build no deben incluir cambios de comportamiento; las features van en commits aparte.
+- En el entorno del asistente no siempre hay JDK ni las librerías de Minecraft: lo que no se pueda compilar hay que compilarlo
+  en el equipo del autor; si algo falla, pedir el error de Gradle.
 - No inventar nombres de la API de Minecraft 26.x ni de cubiomes: comprobar los de cubiomes en los bindings (sección 3.4) y los de
   Minecraft en el código existente del mod, que ya compila.
 - El autor escribe en español; el README y el código están en inglés.

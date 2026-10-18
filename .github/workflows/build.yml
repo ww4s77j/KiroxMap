@@ -1,4 +1,4 @@
-# Builds both loaders (and runs the common tests + layering check) on every push and pull request.
+# Builds every Stonecutter node on every push and pull request.
 name: build
 on: [pull_request, push]
 
@@ -17,12 +17,12 @@ jobs:
           distribution: 'microsoft'
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build
+      - name: build all nodes
         run: ./gradlew build
-      - name: capture build artifacts
+      - name: collect jars
+        run: ./gradlew buildAndCollect
+      - name: upload artifacts
         uses: actions/upload-artifact@v7
         with:
           name: Artifacts
-          path: |
-            fabric/build/libs/
-            neoforge/build/libs/
+          path: build/libs/**

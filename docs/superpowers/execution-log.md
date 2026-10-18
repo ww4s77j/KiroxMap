@@ -91,3 +91,18 @@ Key rulings recorded in the SDD ledger:
 
 - Correction: the NTSTATUS 0xCFFFFFFF exit was the user closing the 26.1.2 window, not a crash. The launch was clean
   (mod loaded, LWJGL, OpenAL and all atlases initialized). Interactive M/seed/map check remains deferred to the user.
+
+### 2026-10-18 — Task 4: complete
+
+- Committed as `e23e249` (`build: add 26.1.2 Stonecutter node`).
+- 26.1.2 jar `build/libs/1.0.1/kirox_map-1.0.1+26.1.2.jar`: `"minecraft":">=26.1 <26.2"`, `"java":">=25"`,
+  `"environment":"client"`, client entrypoint only, one `META-INF/services` file, cubiomes jar-in-jar, no NeoForge metadata.
+- Ledger: `Task 4: complete (commits ef8ccb5..e23e249, tests: ./gradlew :26.1.2:test)`.
+
+### 2026-10-18 — Task 5: remove old modules, CI and docs (in progress)
+
+- Deleted `neoforge/` and `build-logic/` (9 tracked files); removed the leftover untracked `common/` and `fabric/` build folders.
+- Replaced `.github/workflows/build.yml` with the all-node Stonecutter workflow.
+- Updated `CORE_CONTEXT.md` (versions table, paths, cubiomes inclusion, commands, assistant notes) and `README.md`
+  (badges, Fabric-only install, node build commands, 1.21.x/NeoForge unsupported).
+- Running `./gradlew build` + `./gradlew buildAndCollect`; log: `task-5-build.log`.
