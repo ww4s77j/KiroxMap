@@ -5,6 +5,8 @@ import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.Arrays;
 
+import com.kiroxtm.BuildInfo;
+
 import dev.xpple.cubiomes.Cubiomes;
 import dev.xpple.cubiomes.Generator;
 import dev.xpple.cubiomes.Piece;
@@ -44,7 +46,7 @@ public final class SeedWorld {
 
 	/** The cubiomes version constant of the Minecraft version this build targets. */
 	public static int mcVersion() {
-		return Cubiomes.MC_26_3();
+		return BuildInfo.CUBIOMES_MC;
 	}
 
 	public long seed() {
