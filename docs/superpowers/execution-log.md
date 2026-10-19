@@ -106,3 +106,16 @@ Key rulings recorded in the SDD ledger:
 - Updated `CORE_CONTEXT.md` (versions table, paths, cubiomes inclusion, commands, assistant notes) and `README.md`
   (badges, Fabric-only install, node build commands, 1.21.x/NeoForge unsupported).
 - Running `./gradlew build` + `./gradlew buildAndCollect`; log: `task-5-build.log`.
+
+### 2026-10-18 — Final whole-branch review
+
+- Fresh reviewer (Opus) reviewed `0ddcd15..34baf54`, read the plan/spec/ledger, built a detached worktree and reran `./gradlew build`
+  (all 31 tasks, 5 tests per node), and inspected the three jars and the bundled native library.
+- Verdict: ready with fixes. No Critical. One Important: the spec's Phase 0 exit criterion ("launches and renders the existing
+  world map") and Review Focus #2 (native library) were not evidenced; `SeedWorldVersionTest` touches only pure constants.
+- Fix: added `NativeLibTest`, which calls `NativeLib.load()` and generates a 4x4 biome area through `SeedWorld`.
+  `./gradlew test` on all three nodes: BUILD SUCCESSFUL, `NativeLibTest` 1/1 per node, 6 tests per node, 18/18 total.
+  Committed as `4777838`.
+- The reviewer's remaining findings are Minor and deferred in the ledger (shared `run/` folder, generated-source wiring,
+  `fabricloader >=0.19` truncation, stale NeoForge comments, plan/spec removal-timing contradiction, dropped layering check).
+- Still required from the user before merge: press M and confirm biomes/structures render on 26.1.2, 26.2 and 26.3.
