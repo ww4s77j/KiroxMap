@@ -3,8 +3,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Minecraft-26.1.2%20%7C%2026.2%20%7C%2026.3-62b47a?style=flat-square" alt="Minecraft 26.1.2 / 26.2 / 26.3">
+  <img src="https://img.shields.io/badge/Minecraft-26.3-62b47a?style=flat-square" alt="Minecraft 26.3">
   <img src="https://img.shields.io/badge/Fabric-supported-dbd0b4?style=flat-square" alt="Fabric">
+  <img src="https://img.shields.io/badge/NeoForge-supported-d7803b?style=flat-square" alt="NeoForge">
   <img src="https://img.shields.io/badge/Java-25-e76f00?style=flat-square" alt="Java 25">
   <img src="https://img.shields.io/badge/side-client--only-4c8dd6?style=flat-square" alt="Client-side only">
   <img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey?style=flat-square" alt="CC0-1.0">
@@ -12,7 +13,7 @@
 
 **KiroxMap 1.0.1-Beta** is a full-screen world map for Minecraft that works **only from the world seed.** **Press M** and see the biomes and structures of the whole world, including places you have never visited. It never loads chunks and never reads the blocks around you.
 
-> **Client-side only.** Fabric, Minecraft 26.1.2, 26.2 and 26.3.
+> **Client-side only.** Fabric and NeoForge, Minecraft 26.3.
 
 <p align="center">
   <img src="public/covers/1.png" alt="Overworld map with biomes and structures" width="100%">
@@ -98,28 +99,25 @@ The map always shows what the seed generates, not what you have explored. Everyt
 
 ## Installation
 
-1. Install **[Fabric Loader](https://fabricmc.net/use/)** + **[Fabric API](https://modrinth.com/mod/fabric-api)** for Minecraft 26.1.2, 26.2 or 26.3.
+1. Install **[Fabric Loader](https://fabricmc.net/use/)** + **[Fabric API](https://modrinth.com/mod/fabric-api)**, or **[NeoForge](https://neoforged.net/)**, for Minecraft 26.3.
 2. Drop the mod `.jar` into your `mods` folder.
 3. Press **M** in game (changeable in *Controls*).
 
 Requires **Java 25**. No server-side install needed...
-
-> 1.21.x and NeoForge are **not** supported.
 
 ## Building from source
 
 Requires **JDK 25**.
 
 ```bash
-./gradlew build                # all three Minecraft versions + tests
-./gradlew :26.1.2:build        # one version only
-./gradlew :26.2:build
-./gradlew :26.3:build
-./gradlew :26.3:runClient      # test one version
-./gradlew buildAndCollect      # copy every jar to build/libs/<mod version>/
+./gradlew build                # both loaders
+./gradlew :fabric:build        # Fabric only
+./gradlew :neoforge:build      # NeoForge only
+./gradlew :fabric:runClient    # test on Fabric
+./gradlew :neoforge:runClient  # test on NeoForge
 ```
 
-Each Minecraft version is a Stonecutter node over the same source tree in `src/main/`. The jars are generated in `build/libs/<mod version>/` (use the ones without the `-sources` suffix).
+The jars are generated in `fabric/build/libs/` and `neoforge/build/libs/` (use the ones without the `-sources` / `-javadoc` suffix).
 
 ## Credits and license
 
